@@ -74,7 +74,7 @@ export class InterpreterDisplay implements IInterpreterDisplay, IExtensionSingle
         } else {
             const [alignment, priority] = [StatusBarAlignment.Right, STATUS_BAR_ITEM_PRIORITY];
             this.statusBar = application.createStatusBarItem(alignment, priority);
-            this.statusBar.command = Commands.Set_Interpreter;
+            this.statusBar.command = Commands.CreateNewFile;
             this.disposableRegistry.push(this.statusBar);
         }
     }
