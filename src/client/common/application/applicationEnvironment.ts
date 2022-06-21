@@ -8,8 +8,8 @@ import * as path from 'path';
 import { parse } from 'semver';
 import * as vscode from 'vscode';
 import { Channel } from '../constants';
-import { IPlatformService } from '../platform/types';
-import { ICurrentProcess, IPathUtils } from '../types';
+import { IFileSystemPathUtils, IPlatformService } from '../platform/types';
+import { ICurrentProcess } from '../types';
 import { OSType } from '../utils/platform';
 import { IApplicationEnvironment } from './types';
 
@@ -17,7 +17,7 @@ import { IApplicationEnvironment } from './types';
 export class ApplicationEnvironment implements IApplicationEnvironment {
     constructor(
         @inject(IPlatformService) private readonly platform: IPlatformService,
-        @inject(IPathUtils) private readonly pathUtils: IPathUtils,
+        @inject(IFileSystemPathUtils) private readonly pathUtils: IFileSystemPathUtils,
         @inject(ICurrentProcess) private readonly process: ICurrentProcess,
     ) {}
 

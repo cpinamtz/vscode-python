@@ -67,7 +67,7 @@ export interface IFileSystemPaths {
     normCase(filename: string): string;
 }
 
-// Where to fine executables.
+// Where to find executables.
 //
 // In particular this class provides all the tools needed to find
 // executables, including through an environment variable.

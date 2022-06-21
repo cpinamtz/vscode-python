@@ -10,9 +10,8 @@ import { Uri, WorkspaceFolder } from 'vscode';
 import { IWorkspaceService } from '../../../../../client/common/application/types';
 import { WorkspaceService } from '../../../../../client/common/application/workspace';
 import { FileSystem } from '../../../../../client/common/platform/fileSystem';
-import { PathUtils } from '../../../../../client/common/platform/pathUtils';
-import { IFileSystem } from '../../../../../client/common/platform/types';
-import { IPathUtils } from '../../../../../client/common/types';
+import { FileSystemPathUtils } from '../../../../../client/common/platform/fs-paths';
+import { IFileSystem, IFileSystemPathUtils } from '../../../../../client/common/platform/types';
 import { DebugConfigStrings } from '../../../../../client/common/utils/localize';
 import { MultiStepInput } from '../../../../../client/common/utils/multiStepInput';
 import { DebuggerTypeName } from '../../../../../client/debugger/constants';
@@ -22,7 +21,7 @@ import { DebugConfigurationState } from '../../../../../client/debugger/extensio
 suite('Debugging - Configuration Provider Django', () => {
     let fs: IFileSystem;
     let workspaceService: IWorkspaceService;
-    let pathUtils: IPathUtils;
+    let pathUtils: IFileSystemPathUtils;
     let provider: TestDjangoLaunchDebugConfigurationProvider;
     let input: MultiStepInput<DebugConfigurationState>;
     class TestDjangoLaunchDebugConfigurationProvider extends DjangoLaunchDebugConfigurationProvider {
@@ -37,7 +36,7 @@ suite('Debugging - Configuration Provider Django', () => {
     setup(() => {
         fs = mock(FileSystem);
         workspaceService = mock(WorkspaceService);
-        pathUtils = mock(PathUtils);
+        pathUtils = mock(FileSystemPathUtils);
         input = mock<MultiStepInput<DebugConfigurationState>>(MultiStepInput);
         provider = new TestDjangoLaunchDebugConfigurationProvider(
             instance(fs),
@@ -58,7 +57,7 @@ suite('Debugging - Configuration Provider Django', () => {
         const folder = { uri: Uri.parse(path.join('one', 'two')), name: '1', index: 0 };
         const managePyPath = path.join(folder.uri.fsPath, 'manage.py');
 
-        when(pathUtils.separator).thenReturn('-');
+        when(pathUtils.paths.sep).thenReturn('-');
         when(fs.fileExists(managePyPath)).thenResolve(true);
 
         const file = await provider.getManagePyPath(folder);
@@ -126,7 +125,7 @@ suite('Debugging - Configuration Provider Django', () => {
         const folder = { uri: Uri.parse(path.join('one', 'two')), name: '1', index: 0 };
         const state = { config: {}, folder };
         provider.getManagePyPath = () => Promise.resolve('xyz.py');
-        when(pathUtils.separator).thenReturn('-');
+        when(pathUtils.paths.sep).thenReturn('-');
 
         await provider.buildConfiguration(instance(input), state);
 
@@ -146,7 +145,7 @@ suite('Debugging - Configuration Provider Django', () => {
         const folder = { uri: Uri.parse(path.join('one', 'two')), name: '1', index: 0 };
         const state = { config: {}, folder };
         provider.getManagePyPath = () => Promise.resolve(undefined);
-        when(pathUtils.separator).thenReturn('-');
+        when(pathUtils.paths.sep).thenReturn('-');
         when(input.showInputBox(anything())).thenResolve('hello');
 
         await provider.buildConfiguration(instance(input), state);
@@ -170,7 +169,7 @@ suite('Debugging - Configuration Provider Django', () => {
         const workspaceFolderToken = '${workspaceFolder}';
         const defaultProgram = `${workspaceFolderToken}-manage.py`;
 
-        when(pathUtils.separator).thenReturn('-');
+        when(pathUtils.paths.sep).thenReturn('-');
         when(input.showInputBox(anything())).thenResolve();
 
         await provider.buildConfiguration(instance(input), state);

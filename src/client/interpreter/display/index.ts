@@ -4,7 +4,7 @@ import { IExtensionSingleActivationService } from '../../activation/types';
 import { IApplicationShell, IWorkspaceService } from '../../common/application/types';
 import { Commands, PYTHON_LANGUAGE } from '../../common/constants';
 import '../../common/extensions';
-import { IDisposableRegistry, IPathUtils, Resource } from '../../common/types';
+import { IDisposableRegistry, Resource } from '../../common/types';
 import { InterpreterQuickPickList } from '../../common/utils/localize';
 import { IServiceContainer } from '../../ioc/types';
 import { traceLog } from '../../logging';
@@ -16,6 +16,7 @@ import {
     IInterpreterStatusbarVisibilityFilter,
 } from '../contracts';
 import * as nls from 'vscode-nls';
+import { IFileSystemPathUtils } from '../../common/platform/types';
 
 const localize: nls.LocalizeFunc = nls.loadMessageBundle();
 
@@ -35,7 +36,7 @@ export class InterpreterDisplay implements IInterpreterDisplay, IExtensionSingle
     private languageStatus: LanguageStatusItem | undefined;
     private readonly helper: IInterpreterHelper;
     private readonly workspaceService: IWorkspaceService;
-    private readonly pathUtils: IPathUtils;
+    private readonly pathUtils: IFileSystemPathUtils;
     private readonly interpreterService: IInterpreterService;
     private currentlySelectedInterpreterDisplay?: string;
     private currentlySelectedInterpreterPath?: string;
@@ -47,7 +48,7 @@ export class InterpreterDisplay implements IInterpreterDisplay, IExtensionSingle
     constructor(@inject(IServiceContainer) private readonly serviceContainer: IServiceContainer) {
         this.helper = serviceContainer.get<IInterpreterHelper>(IInterpreterHelper);
         this.workspaceService = serviceContainer.get<IWorkspaceService>(IWorkspaceService);
-        this.pathUtils = serviceContainer.get<IPathUtils>(IPathUtils);
+        this.pathUtils = serviceContainer.get<IFileSystemPathUtils>(IFileSystemPathUtils);
         this.interpreterService = serviceContainer.get<IInterpreterService>(IInterpreterService);
 
         this.disposableRegistry = serviceContainer.get<Disposable[]>(IDisposableRegistry);

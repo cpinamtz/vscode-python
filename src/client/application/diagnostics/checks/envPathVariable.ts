@@ -6,8 +6,8 @@ import { inject, injectable } from 'inversify';
 import { DiagnosticSeverity } from 'vscode';
 import { IApplicationEnvironment } from '../../../common/application/types';
 import '../../../common/extensions';
-import { IPlatformService } from '../../../common/platform/types';
-import { ICurrentProcess, IDisposableRegistry, IPathUtils, Resource } from '../../../common/types';
+import { IFileSystemPathUtils, IPlatformService } from '../../../common/platform/types';
+import { ICurrentProcess, IDisposableRegistry, Resource } from '../../../common/types';
 import { Common } from '../../../common/utils/localize';
 import { IServiceContainer } from '../../../ioc/types';
 import { BaseDiagnostic, BaseDiagnosticsService } from '../base';
@@ -97,7 +97,7 @@ export class EnvironmentPathVariableDiagnosticsService extends BaseDiagnosticsSe
     private doesPathVariableHaveInvalidEntries() {
         const currentProc = this.serviceContainer.get<ICurrentProcess>(ICurrentProcess);
         const pathValue = currentProc.env[this.platform.pathVariableName];
-        const pathSeparator = this.serviceContainer.get<IPathUtils>(IPathUtils).delimiter;
+        const pathSeparator = this.serviceContainer.get<IFileSystemPathUtils>(IFileSystemPathUtils).paths.sep;
         const paths = (pathValue || '').split(pathSeparator);
         return paths.filter((item) => item.indexOf('"') >= 0).length > 0;
     }
