@@ -10,9 +10,9 @@ import { QuickPick, QuickPickItem, QuickPickItemKind } from 'vscode';
 import * as nls from 'vscode-nls';
 import { IApplicationShell, ICommandManager, IWorkspaceService } from '../../../../common/application/types';
 import { Commands, Octicons } from '../../../../common/constants';
-import { isParentPath } from '../../../../common/platform/fs-paths';
+import { FileSystemPathUtils, isParentPath } from '../../../../common/platform/fs-paths';
 import { IPlatformService } from '../../../../common/platform/types';
-import { IConfigurationService, IPathUtils, Resource } from '../../../../common/types';
+import { IConfigurationService, Resource } from '../../../../common/types';
 import { getIcon } from '../../../../common/utils/icons';
 import { Common, InterpreterQuickPickList } from '../../../../common/utils/localize';
 import {
@@ -76,7 +76,7 @@ export class SetInterpreterCommand extends BaseInterpreterSelectorCommand {
 
     constructor(
         @inject(IApplicationShell) applicationShell: IApplicationShell,
-        @inject(IPathUtils) pathUtils: IPathUtils,
+        @inject(FileSystemPathUtils) pathUtils: FileSystemPathUtils,
         @inject(IPythonPathUpdaterServiceManager)
         pythonPathUpdaterService: IPythonPathUpdaterServiceManager,
         @inject(IConfigurationService) configurationService: IConfigurationService,

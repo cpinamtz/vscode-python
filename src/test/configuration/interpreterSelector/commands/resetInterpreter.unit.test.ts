@@ -3,13 +3,15 @@
 
 import * as path from 'path';
 import * as TypeMoq from 'typemoq';
+import untildify = require('untildify');
 import { ConfigurationTarget, Uri } from 'vscode';
 import { IApplicationShell, ICommandManager, IWorkspaceService } from '../../../../client/common/application/types';
-import { PathUtils } from '../../../../client/common/platform/pathUtils';
+import { Executables, FileSystemPaths, FileSystemPathUtils } from '../../../../client/common/platform/fs-paths';
 import { IConfigurationService } from '../../../../client/common/types';
 import { Common, Interpreters } from '../../../../client/common/utils/localize';
 import { ResetInterpreterCommand } from '../../../../client/interpreter/configuration/interpreterSelector/commands/resetInterpreter';
 import { IPythonPathUpdaterServiceManager } from '../../../../client/interpreter/configuration/types';
+import { OSType } from '../../../common';
 
 suite('Reset Interpreter Command', () => {
     let workspace: TypeMoq.IMock<IWorkspaceService>;
@@ -38,7 +40,12 @@ suite('Reset Interpreter Command', () => {
             commandManager.object,
             appShell.object,
             workspace.object,
-            new PathUtils(false),
+            new FileSystemPathUtils(
+                untildify('~'),
+                FileSystemPaths.withDefaults(),
+                new Executables(path.delimiter, OSType.Unknown),
+                path,
+            ), // not sure about this
             configurationService.object,
         );
     });

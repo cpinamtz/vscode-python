@@ -6,7 +6,8 @@
 import { inject, injectable } from 'inversify';
 import { IApplicationShell, ICommandManager, IWorkspaceService } from '../../../../common/application/types';
 import { Commands } from '../../../../common/constants';
-import { IConfigurationService, IPathUtils } from '../../../../common/types';
+import { IFileSystemPathUtils } from '../../../../common/platform/types';
+import { IConfigurationService } from '../../../../common/types';
 import { IPythonPathUpdaterServiceManager } from '../../types';
 import { BaseInterpreterSelectorCommand } from './base';
 
@@ -17,7 +18,7 @@ export class ResetInterpreterCommand extends BaseInterpreterSelectorCommand {
         @inject(ICommandManager) commandManager: ICommandManager,
         @inject(IApplicationShell) applicationShell: IApplicationShell,
         @inject(IWorkspaceService) workspaceService: IWorkspaceService,
-        @inject(IPathUtils) pathUtils: IPathUtils,
+        @inject(IFileSystemPathUtils) pathUtils: IFileSystemPathUtils,
         @inject(IConfigurationService) configurationService: IConfigurationService,
     ) {
         super(

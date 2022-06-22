@@ -8,7 +8,8 @@ import * as path from 'path';
 import { ConfigurationTarget, Disposable, QuickPickItem, Uri } from 'vscode';
 import { IExtensionSingleActivationService } from '../../../../activation/types';
 import { IApplicationShell, ICommandManager, IWorkspaceService } from '../../../../common/application/types';
-import { IConfigurationService, IDisposable, IPathUtils, Resource } from '../../../../common/types';
+import { IFileSystemPathUtils } from '../../../../common/platform/types';
+import { IConfigurationService, IDisposable, Resource } from '../../../../common/types';
 import { Common, Interpreters } from '../../../../common/utils/localize';
 import { IPythonPathUpdaterServiceManager } from '../../types';
 export interface WorkspaceSelectionQuickPickItem extends QuickPickItem {
@@ -23,7 +24,7 @@ export abstract class BaseInterpreterSelectorCommand implements IExtensionSingle
         @unmanaged() protected readonly commandManager: ICommandManager,
         @unmanaged() protected readonly applicationShell: IApplicationShell,
         @unmanaged() protected readonly workspaceService: IWorkspaceService,
-        @unmanaged() protected readonly pathUtils: IPathUtils,
+        @unmanaged() protected readonly pathUtils: IFileSystemPathUtils,
         @unmanaged() protected readonly configurationService: IConfigurationService,
     ) {
         this.disposables.push(this);

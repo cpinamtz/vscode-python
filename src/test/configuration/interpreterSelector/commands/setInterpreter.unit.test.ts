@@ -18,7 +18,6 @@ import {
 import { cloneDeep } from 'lodash';
 import { anything, instance, mock, verify, when } from 'ts-mockito';
 import { IApplicationShell, ICommandManager, IWorkspaceService } from '../../../../client/common/application/types';
-import { PathUtils } from '../../../../client/common/platform/pathUtils';
 import { IPlatformService } from '../../../../client/common/platform/types';
 import { IConfigurationService, IPythonSettings } from '../../../../client/common/types';
 import { Common, InterpreterQuickPickList, Interpreters } from '../../../../client/common/utils/localize';
@@ -46,6 +45,8 @@ import { Octicons } from '../../../../client/common/constants';
 import { IInterpreterService, PythonEnvironmentsChangedEvent } from '../../../../client/interpreter/contracts';
 import { createDeferred, sleep } from '../../../../client/common/utils/async';
 import { SystemVariables } from '../../../../client/common/variables/systemVariables';
+import { Executables, FileSystemPaths, FileSystemPathUtils } from '../../../../client/common/platform/fs-paths';
+import { OSType } from '../../../common';
 
 const untildify = require('untildify');
 
@@ -87,7 +88,12 @@ suite('Set Interpreter Command', () => {
 
         setInterpreterCommand = new SetInterpreterCommand(
             appShell.object,
-            new PathUtils(false),
+            new FileSystemPathUtils(
+                untildify('~'),
+                FileSystemPaths.withDefaults(),
+                new Executables(path.delimiter, OSType.Unknown),
+                path,
+            ), // not sure about this
             pythonPathUpdater.object,
             configurationService.object,
             commandManager.object,
@@ -187,7 +193,12 @@ suite('Set Interpreter Command', () => {
 
             setInterpreterCommand = new SetInterpreterCommand(
                 appShell.object,
-                new PathUtils(false),
+                new FileSystemPathUtils(
+                    untildify('~'),
+                    FileSystemPaths.withDefaults(),
+                    new Executables(path.delimiter, OSType.Unknown),
+                    path,
+                ), // not sure about this,
                 pythonPathUpdater.object,
                 configurationService.object,
                 commandManager.object,
@@ -376,7 +387,12 @@ suite('Set Interpreter Command', () => {
             const workspaceDefaultInterpreterPath = '${workspaceFolder}/defaultInterpreterPath';
 
             const systemVariables = new SystemVariables(undefined, undefined, workspace.object);
-            const pathUtils = new PathUtils(false);
+            const pathUtils = new FileSystemPathUtils(
+                untildify('~'),
+                FileSystemPaths.withDefaults(),
+                new Executables(path.delimiter, OSType.Unknown),
+                path,
+            ); // not sure about this;
 
             const expandedPath = systemVariables.resolveAny(workspaceDefaultInterpreterPath);
             const expandedDetail = pathUtils.getDisplayName(expandedPath);
@@ -1162,7 +1178,12 @@ suite('Set Interpreter Command', () => {
             const pickInterpreter = sinon.stub(SetInterpreterCommand.prototype, '_pickInterpreter');
             setInterpreterCommand = new SetInterpreterCommand(
                 appShell.object,
-                new PathUtils(false),
+                new FileSystemPathUtils(
+                    untildify('~'),
+                    FileSystemPaths.withDefaults(),
+                    new Executables(path.delimiter, OSType.Unknown),
+                    path,
+                ), // not sure about this,
                 pythonPathUpdater.object,
                 configurationService.object,
                 commandManager.object,

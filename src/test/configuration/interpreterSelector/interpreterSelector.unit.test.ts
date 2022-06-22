@@ -6,8 +6,9 @@ import * as assert from 'assert';
 import * as path from 'path';
 import { SemVer } from 'semver';
 import * as TypeMoq from 'typemoq';
+import untildify from 'untildify';
 import { Uri } from 'vscode';
-import { PathUtils } from '../../../client/common/platform/pathUtils';
+import { Executables, FileSystemPaths, FileSystemPathUtils } from '../../../client/common/platform/fs-paths';
 import { IFileSystem } from '../../../client/common/platform/types';
 import { Architecture } from '../../../client/common/utils/platform';
 import { EnvironmentTypeComparer } from '../../../client/interpreter/configuration/environmentTypeComparer';
@@ -15,7 +16,7 @@ import { InterpreterSelector } from '../../../client/interpreter/configuration/i
 import { IInterpreterComparer, IInterpreterQuickPickItem } from '../../../client/interpreter/configuration/types';
 import { IInterpreterHelper, IInterpreterService, WorkspacePythonPath } from '../../../client/interpreter/contracts';
 import { EnvironmentType, PythonEnvironment } from '../../../client/pythonEnvironments/info';
-import { getOSType, OSType } from '../../common';
+import { OSType } from '../../common';
 
 const info: PythonEnvironment = {
     architecture: Architecture.Unknown,
@@ -68,15 +69,29 @@ suite('Interpreters - selector', () => {
             .returns((a: string, b: string) => a === b);
 
         newComparer.setup((c) => c.compare(TypeMoq.It.isAny(), TypeMoq.It.isAny())).returns(() => 0);
-        selector = new TestInterpreterSelector(interpreterService.object, newComparer.object, new PathUtils(false));
+        selector = new TestInterpreterSelector(
+            interpreterService.object,
+            newComparer.object,
+            new FileSystemPathUtils(
+                untildify('~'),
+                FileSystemPaths.withDefaults(),
+                new Executables(path.delimiter, OSType.Unknown),
+                path,
+            ), // not sure about this
+        );
     });
 
-    [true, false].forEach((isWindows) => {
-        test(`Suggestions (${isWindows ? 'Windows' : 'Non-Windows'})`, async () => {
+    [OSType.Windows, OSType.Unknown].forEach((osType) => {
+        test(`Suggestions (${osType === OSType.Windows ? 'Windows' : 'Non-Windows'})`, async () => {
             selector = new TestInterpreterSelector(
                 interpreterService.object,
                 newComparer.object,
-                new PathUtils(isWindows),
+                new FileSystemPathUtils(
+                    untildify('~'),
+                    FileSystemPaths.withDefaults(),
+                    new Executables(path.delimiter, osType),
+                    path,
+                ), // not sure about this
             );
 
             const initial: PythonEnvironment[] = [
@@ -175,7 +190,7 @@ suite('Interpreters - selector', () => {
         selector = new TestInterpreterSelector(
             interpreterService.object,
             environmentTypeComparer,
-            new PathUtils(getOSType() === OSType.Windows),
+            new FileSystemPathUtils(untildify('~'), FileSystemPaths.withDefaults(), Executables.withDefaults(), path),
         );
 
         const result = await selector.getAllSuggestions(undefined);

@@ -6,7 +6,8 @@
 import { inject, injectable } from 'inversify';
 import { Disposable, Uri } from 'vscode';
 import { arePathsSame } from '../../../common/platform/fs-paths';
-import { IPathUtils, Resource } from '../../../common/types';
+import { IFileSystemPathUtils } from '../../../common/platform/types';
+import { Resource } from '../../../common/types';
 import { getEnvPath } from '../../../pythonEnvironments/base/info/env';
 import { PythonEnvironment } from '../../../pythonEnvironments/info';
 import { IInterpreterService } from '../../contracts';
@@ -19,7 +20,7 @@ export class InterpreterSelector implements IInterpreterSelector {
     constructor(
         @inject(IInterpreterService) private readonly interpreterManager: IInterpreterService,
         @inject(IInterpreterComparer) private readonly envTypeComparer: IInterpreterComparer,
-        @inject(IPathUtils) private readonly pathUtils: IPathUtils,
+        @inject(IFileSystemPathUtils) private readonly pathUtils: IFileSystemPathUtils,
     ) {}
 
     public dispose(): void {
