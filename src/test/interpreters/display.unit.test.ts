@@ -18,7 +18,7 @@ import { IExtensionSingleActivationService } from '../../client/activation/types
 import { IApplicationShell, IWorkspaceService } from '../../client/common/application/types';
 import { Commands, PYTHON_LANGUAGE } from '../../client/common/constants';
 import { IFileSystem, IFileSystemPathUtils } from '../../client/common/platform/types';
-import { IDisposableRegistry, IPathUtils, ReadWrite } from '../../client/common/types';
+import { IDisposableRegistry, ReadWrite } from '../../client/common/types';
 import { InterpreterQuickPickList } from '../../client/common/utils/localize';
 import { Architecture } from '../../client/common/utils/platform';
 import {
@@ -91,7 +91,6 @@ suite('Interpreters Display', () => {
         serviceContainer
             .setup((c) => c.get(TypeMoq.It.isValue(IInterpreterHelper)))
             .returns(() => interpreterHelper.object);
-        serviceContainer.setup((c) => c.get(TypeMoq.It.isValue(IPathUtils))).returns(() => pathUtils.object);
         if (!useLanguageStatus) {
             applicationShell
                 .setup((a) => a.createStatusBarItem(TypeMoq.It.isValue(StatusBarAlignment.Right), TypeMoq.It.isAny()))
