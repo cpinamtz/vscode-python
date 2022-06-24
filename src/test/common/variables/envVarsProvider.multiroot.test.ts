@@ -8,8 +8,8 @@ import { anything, instance, mock, when } from 'ts-mockito';
 import { ConfigurationTarget, Disposable, Uri, workspace } from 'vscode';
 import { WorkspaceService } from '../../../client/common/application/workspace';
 import { PlatformService } from '../../../client/common/platform/platformService';
-import { IFileSystem } from '../../../client/common/platform/types';
-import { IDisposableRegistry, IPathUtils } from '../../../client/common/types';
+import { IFileSystem, IFileSystemPathUtils } from '../../../client/common/platform/types';
+import { IDisposableRegistry } from '../../../client/common/types';
 import { getSearchPathEnvVarNames } from '../../../client/common/utils/exec';
 import { EnvironmentVariablesService } from '../../../client/common/variables/environment';
 import { EnvironmentVariablesProvider } from '../../../client/common/variables/environmentVariablesProvider';
@@ -65,7 +65,7 @@ suite('Multiroot Environment Variables Provider', () => {
     });
 
     function getVariablesProvider(mockVariables: EnvironmentVariables = { ...process.env }) {
-        const pathUtils = ioc.serviceContainer.get<IPathUtils>(IPathUtils);
+        const pathUtils = ioc.serviceContainer.get<IFileSystemPathUtils>(IFileSystemPathUtils);
         const fs = ioc.serviceContainer.get<IFileSystem>(IFileSystem);
         const mockProcess = new MockProcess(mockVariables);
         const variablesService = new EnvironmentVariablesService(pathUtils, fs);

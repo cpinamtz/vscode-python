@@ -22,8 +22,8 @@ import {
     IDiagnosticsService,
 } from '../../../../client/application/diagnostics/types';
 import { IApplicationEnvironment, IWorkspaceService } from '../../../../client/common/application/types';
-import { IPlatformService } from '../../../../client/common/platform/types';
-import { ICurrentProcess, IPathUtils } from '../../../../client/common/types';
+import { IFileSystemPathUtils, IPlatformService } from '../../../../client/common/platform/types';
+import { ICurrentProcess } from '../../../../client/common/types';
 import { EnvironmentVariables } from '../../../../client/common/variables/types';
 import { IServiceContainer } from '../../../../client/ioc/types';
 
@@ -75,9 +75,9 @@ suite('Application Diagnostics - PowerShell Activation', () => {
         currentProc.setup((p) => p.env).returns(() => procEnv.object);
         serviceContainer.setup((s) => s.get(typemoq.It.isValue(ICurrentProcess))).returns(() => currentProc.object);
 
-        const pathUtils = typemoq.Mock.ofType<IPathUtils>();
-        pathUtils.setup((p) => p.delimiter).returns(() => pathDelimiter);
-        serviceContainer.setup((s) => s.get(typemoq.It.isValue(IPathUtils))).returns(() => pathUtils.object);
+        const pathUtils = typemoq.Mock.ofType<IFileSystemPathUtils>();
+        pathUtils.setup((p) => p.executables.delimiter).returns(() => pathDelimiter);
+        serviceContainer.setup((s) => s.get(typemoq.It.isValue(IFileSystemPathUtils))).returns(() => pathUtils.object);
 
         const workspaceService = typemoq.Mock.ofType<IWorkspaceService>();
         serviceContainer

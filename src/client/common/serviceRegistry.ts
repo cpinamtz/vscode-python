@@ -13,7 +13,6 @@ import {
     IHttpClient,
     IInstaller,
     IInterpreterPathService,
-    IPathUtils,
     IPersistentStateFactory,
     IRandom,
     IToolExecutionPath,
@@ -65,7 +64,6 @@ import { FileDownloader } from './net/fileDownloader';
 import { HttpClient } from './net/httpClient';
 import { PersistentStateFactory } from './persistentState';
 import { IS_WINDOWS } from './platform/constants';
-import { PathUtils } from './platform/pathUtils';
 import { CurrentProcess } from './process/currentProcess';
 import { ProcessLogger } from './process/logger';
 import { IProcessLogger } from './process/types';
@@ -95,6 +93,8 @@ import {
 import { IMultiStepInputFactory, MultiStepInputFactory } from './utils/multiStepInput';
 import { Random } from './utils/random';
 import { ContextKeyManager } from './application/contextKeyManager';
+import { IFileSystemPathUtils } from './platform/types';
+import { FileSystemPathUtils } from './platform/fs-paths';
 
 export function registerTypes(serviceManager: IServiceManager): void {
     serviceManager.addSingletonInstance<boolean>(IsWindows, IS_WINDOWS);
@@ -106,7 +106,7 @@ export function registerTypes(serviceManager: IServiceManager): void {
     serviceManager.addSingleton<IPersistentStateFactory>(IPersistentStateFactory, PersistentStateFactory);
     serviceManager.addBinding(IPersistentStateFactory, IExtensionSingleActivationService);
     serviceManager.addSingleton<ITerminalServiceFactory>(ITerminalServiceFactory, TerminalServiceFactory);
-    serviceManager.addSingleton<IPathUtils>(IPathUtils, PathUtils);
+    serviceManager.addSingleton<IFileSystemPathUtils>(IFileSystemPathUtils, FileSystemPathUtils);
     serviceManager.addSingleton<IApplicationShell>(IApplicationShell, ApplicationShell);
     serviceManager.addSingleton<IClipboard>(IClipboard, ClipboardService);
     serviceManager.addSingleton<ICurrentProcess>(ICurrentProcess, CurrentProcess);

@@ -4,7 +4,8 @@
 'use strict';
 
 import { inject, injectable } from 'inversify';
-import { ICurrentProcess, IPathUtils } from '../../../../common/types';
+import { IFileSystemPathUtils } from '../../../../common/platform/types';
+import { ICurrentProcess } from '../../../../common/types';
 import { EnvironmentVariables, IEnvironmentVariablesService } from '../../../../common/variables/types';
 import { LaunchRequestArguments } from '../../../types';
 
@@ -17,11 +18,11 @@ export interface IDebugEnvironmentVariablesService {
 export class DebugEnvironmentVariablesHelper implements IDebugEnvironmentVariablesService {
     constructor(
         @inject(IEnvironmentVariablesService) private envParser: IEnvironmentVariablesService,
-        @inject(IPathUtils) private pathUtils: IPathUtils,
+        @inject(IFileSystemPathUtils) private pathUtils: IFileSystemPathUtils,
         @inject(ICurrentProcess) private process: ICurrentProcess,
     ) {}
     public async getEnvironmentVariables(args: LaunchRequestArguments): Promise<EnvironmentVariables> {
-        const pathVariableName = this.pathUtils.getPathVariableName();
+        const pathVariableName = this.pathUtils.executables.envVar;
 
         // Merge variables from both .env file and env json variables.
         const debugLaunchEnvVars: Record<string, string> =

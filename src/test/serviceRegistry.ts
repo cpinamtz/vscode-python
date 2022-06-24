@@ -8,11 +8,11 @@ import { Disposable, Memento, OutputChannel } from 'vscode';
 import { STANDARD_OUTPUT_CHANNEL } from '../client/common/constants';
 import { IS_WINDOWS } from '../client/common/platform/constants';
 import { FileSystem } from '../client/common/platform/fileSystem';
-import { PathUtils } from '../client/common/platform/pathUtils';
+import { FileSystemPathUtils } from '../client/common/platform/fs-paths';
 import { PlatformService } from '../client/common/platform/platformService';
 import { RegistryImplementation } from '../client/common/platform/registry';
 import { registerTypes as platformRegisterTypes } from '../client/common/platform/serviceRegistry';
-import { IFileSystem, IPlatformService, IRegistry } from '../client/common/platform/types';
+import { IFileSystem, IFileSystemPathUtils, IPlatformService, IRegistry } from '../client/common/platform/types';
 import { BufferDecoder } from '../client/common/process/decoder';
 import { ProcessService } from '../client/common/process/proc';
 import { PythonExecutionFactory } from '../client/common/process/pythonExecutionFactory';
@@ -31,7 +31,6 @@ import {
     IDisposableRegistry,
     IMemento,
     IOutputChannel,
-    IPathUtils,
     IsWindows,
     WORKSPACE_MEMENTO,
 } from '../client/common/types';
@@ -205,7 +204,7 @@ export class IocContainer {
     public registerMockProcess(): void {
         this.serviceManager.addSingletonInstance<boolean>(IsWindows, IS_WINDOWS);
 
-        this.serviceManager.addSingleton<IPathUtils>(IPathUtils, PathUtils);
+        this.serviceManager.addSingleton<IFileSystemPathUtils>(IFileSystemPathUtils, FileSystemPathUtils);
         this.serviceManager.addSingleton<ICurrentProcess>(ICurrentProcess, MockProcess);
     }
 }

@@ -7,8 +7,7 @@ import { expect, use } from 'chai';
 import * as chaiAsPromised from 'chai-as-promised';
 import * as path from 'path';
 import * as TypeMoq from 'typemoq';
-import { IFileSystem } from '../../../client/common/platform/types';
-import { IPathUtils } from '../../../client/common/types';
+import { IFileSystem, IFileSystemPathUtils } from '../../../client/common/platform/types';
 import { EnvironmentVariablesService, parseEnvFile } from '../../../client/common/variables/environment';
 
 use(chaiAsPromised);
@@ -21,11 +20,11 @@ const PATHS = [
 
 suite('Environment Variables Service', () => {
     const filename = 'x/y/z/.env';
-    let pathUtils: TypeMoq.IMock<IPathUtils>;
+    let pathUtils: TypeMoq.IMock<IFileSystemPathUtils>;
     let fs: TypeMoq.IMock<IFileSystem>;
     let variablesService: EnvironmentVariablesService;
     setup(() => {
-        pathUtils = TypeMoq.Mock.ofType<IPathUtils>(undefined, TypeMoq.MockBehavior.Strict);
+        pathUtils = TypeMoq.Mock.ofType<IFileSystemPathUtils>(undefined, TypeMoq.MockBehavior.Strict);
         fs = TypeMoq.Mock.ofType<IFileSystem>(undefined, TypeMoq.MockBehavior.Strict);
         variablesService = new EnvironmentVariablesService(
             // This is the only place that the mocks are used.
@@ -160,7 +159,7 @@ PYTHON=${BINDIR}/python3\n\
         suite(`mergeVariables() (path var: ${pathVariable})`, () => {
             setup(() => {
                 pathUtils
-                    .setup((pu) => pu.getPathVariableName()) // This always gets called.
+                    .setup((pu) => pu.executables.envVar) // This always gets called.
                     .returns(() => pathVariable as PathVar); // Pretend we're on a specific platform.
             });
 
@@ -236,7 +235,7 @@ PYTHON=${BINDIR}/python3\n\
         suite(`appendPath() (path var: ${pathVariable})`, () => {
             setup(() => {
                 pathUtils
-                    .setup((pu) => pu.getPathVariableName()) // This always gets called.
+                    .setup((pu) => pu.executables.envVar) // This always gets called.
                     .returns(() => pathVariable as PathVar); // Pretend we're on a specific platform.
             });
 

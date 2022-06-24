@@ -6,12 +6,10 @@
 import { expect, use } from 'chai';
 import * as chaiAsPromised from 'chai-as-promised';
 import { FileSystem } from '../../../client/common/platform/fileSystem';
-import { PathUtils } from '../../../client/common/platform/pathUtils';
-import { IPathUtils } from '../../../client/common/types';
-import { OSType } from '../../../client/common/utils/platform';
+import { FileSystemPathUtils } from '../../../client/common/platform/fs-paths';
+import { IFileSystemPathUtils } from '../../../client/common/platform/types';
 import { EnvironmentVariablesService } from '../../../client/common/variables/environment';
 import { IEnvironmentVariablesService } from '../../../client/common/variables/types';
-import { getOSType } from '../../common';
 
 use(chaiAsPromised);
 
@@ -19,10 +17,10 @@ use(chaiAsPromised);
 // in envVarsService.test.ts.
 
 suite('Environment Variables Service', () => {
-    let pathUtils: IPathUtils;
+    let pathUtils: IFileSystemPathUtils;
     let variablesService: IEnvironmentVariablesService;
     setup(() => {
-        pathUtils = new PathUtils(getOSType() === OSType.Windows);
+        pathUtils = FileSystemPathUtils.withDefaults();
         const fs = new FileSystem();
         variablesService = new EnvironmentVariablesService(pathUtils, fs);
     });

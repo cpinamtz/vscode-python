@@ -17,7 +17,7 @@ import {
 import { IExtensionSingleActivationService } from '../../client/activation/types';
 import { IApplicationShell, IWorkspaceService } from '../../client/common/application/types';
 import { Commands, PYTHON_LANGUAGE } from '../../client/common/constants';
-import { IFileSystem } from '../../client/common/platform/types';
+import { IFileSystem, IFileSystemPathUtils } from '../../client/common/platform/types';
 import { IDisposableRegistry, IPathUtils, ReadWrite } from '../../client/common/types';
 import { InterpreterQuickPickList } from '../../client/common/utils/localize';
 import { Architecture } from '../../client/common/utils/platform';
@@ -54,7 +54,7 @@ suite('Interpreters Display', () => {
     let statusBar: TypeMoq.IMock<StatusBarItem>;
     let interpreterDisplay: IInterpreterDisplay & IExtensionSingleActivationService;
     let interpreterHelper: TypeMoq.IMock<IInterpreterHelper>;
-    let pathUtils: TypeMoq.IMock<IPathUtils>;
+    let pathUtils: TypeMoq.IMock<IFileSystemPathUtils>;
     let languageStatusItem: TypeMoq.IMock<LanguageStatusItem>;
     let traceLogStub: sinon.SinonStub;
     async function createInterpreterDisplay(filters: IInterpreterStatusbarVisibilityFilter[] = []) {
@@ -73,7 +73,7 @@ suite('Interpreters Display', () => {
         disposableRegistry = [];
         statusBar = TypeMoq.Mock.ofType<StatusBarItem>();
         languageStatusItem = TypeMoq.Mock.ofType<LanguageStatusItem>();
-        pathUtils = TypeMoq.Mock.ofType<IPathUtils>();
+        pathUtils = TypeMoq.Mock.ofType<IFileSystemPathUtils>();
 
         traceLogStub = sinon.stub(logging, 'traceLog');
 

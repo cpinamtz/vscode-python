@@ -6,8 +6,7 @@ import * as path from 'path';
 import { traceError } from '../../logging';
 import { sendTelemetryEvent } from '../../telemetry';
 import { EventName } from '../../telemetry/constants';
-import { IFileSystem } from '../platform/types';
-import { IPathUtils } from '../types';
+import { IFileSystem, IFileSystemPathUtils } from '../platform/types';
 import { EnvironmentVariables, IEnvironmentVariablesService } from './types';
 
 @injectable()
@@ -15,7 +14,7 @@ export class EnvironmentVariablesService implements IEnvironmentVariablesService
     private _pathVariable?: 'Path' | 'PATH';
     constructor(
         // We only use a small portion of either of these interfaces.
-        @inject(IPathUtils) private readonly pathUtils: IPathUtils,
+        @inject(IFileSystemPathUtils) private readonly pathUtils: IFileSystemPathUtils,
         @inject(IFileSystem) private readonly fs: IFileSystem,
     ) {}
 
@@ -65,7 +64,7 @@ export class EnvironmentVariablesService implements IEnvironmentVariablesService
 
     private get pathVariable(): 'Path' | 'PATH' {
         if (!this._pathVariable) {
-            this._pathVariable = this.pathUtils.getPathVariableName();
+            this._pathVariable = this.pathUtils.executables.envVar as 'Path' | 'PATH';
         }
         return this._pathVariable!;
     }

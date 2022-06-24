@@ -43,9 +43,8 @@ import { FileDownloader } from '../../client/common/net/fileDownloader';
 import { HttpClient } from '../../client/common/net/httpClient';
 import { PersistentStateFactory } from '../../client/common/persistentState';
 import { FileSystem } from '../../client/common/platform/fileSystem';
-import { PathUtils } from '../../client/common/platform/pathUtils';
 import { PlatformService } from '../../client/common/platform/platformService';
-import { IFileSystem, IPlatformService } from '../../client/common/platform/types';
+import { IFileSystem, IFileSystemPathUtils, IPlatformService } from '../../client/common/platform/types';
 import { CurrentProcess } from '../../client/common/process/currentProcess';
 import { ProcessLogger } from '../../client/common/process/logger';
 import { IProcessLogger, IProcessServiceFactory } from '../../client/common/process/types';
@@ -83,7 +82,6 @@ import {
     IHttpClient,
     IInstaller,
     IInterpreterPathService,
-    IPathUtils,
     IPersistentStateFactory,
     IPythonSettings,
     IRandom,
@@ -103,6 +101,7 @@ import { MockModuleInstaller } from '../mocks/moduleInstaller';
 import { MockProcessService } from '../mocks/proc';
 import { UnitTestIocContainer } from '../testing/serviceRegistry';
 import { closeActiveWindows, initializeTest } from '../initialize';
+import { FileSystemPathUtils } from '../../client/common/platform/fs-paths';
 
 chaiUse(chaiAsPromised);
 
@@ -170,7 +169,7 @@ suite('Module Installer', () => {
             ioc.serviceManager.addSingleton<IModuleInstaller>(IModuleInstaller, CondaInstaller);
             ioc.serviceManager.addSingleton<IModuleInstaller>(IModuleInstaller, PipEnvInstaller);
 
-            ioc.serviceManager.addSingleton<IPathUtils>(IPathUtils, PathUtils);
+            ioc.serviceManager.addSingleton<IFileSystemPathUtils>(IFileSystemPathUtils, FileSystemPathUtils);
             ioc.serviceManager.addSingleton<ICurrentProcess>(ICurrentProcess, CurrentProcess);
             ioc.serviceManager.addSingleton<IFileSystem>(IFileSystem, FileSystem);
             ioc.serviceManager.addSingleton<IPlatformService>(IPlatformService, PlatformService);

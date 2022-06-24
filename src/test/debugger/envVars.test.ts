@@ -5,7 +5,8 @@ import { expect, use } from 'chai';
 import * as chaiAsPromised from 'chai-as-promised';
 import * as path from 'path';
 import * as shortid from 'shortid';
-import { ICurrentProcess, IPathUtils } from '../../client/common/types';
+import { IFileSystemPathUtils } from '../../client/common/platform/types';
+import { ICurrentProcess } from '../../client/common/types';
 import { IEnvironmentVariablesService } from '../../client/common/variables/types';
 import {
     DebugEnvironmentVariablesHelper,
@@ -35,10 +36,10 @@ suite('Resolving Environment Variables when Debugging', () => {
         await initializeDI();
         await initializeTest();
         const envParser = ioc.serviceContainer.get<IEnvironmentVariablesService>(IEnvironmentVariablesService);
-        const pathUtils = ioc.serviceContainer.get<IPathUtils>(IPathUtils);
+        const pathUtils = ioc.serviceContainer.get<IFileSystemPathUtils>(IFileSystemPathUtils);
         mockProcess = ioc.serviceContainer.get<ICurrentProcess>(ICurrentProcess);
         debugEnvParser = new DebugEnvironmentVariablesHelper(envParser, pathUtils, mockProcess);
-        pathVariableName = pathUtils.getPathVariableName();
+        pathVariableName = pathUtils.executables.envVar;
     });
     suiteTeardown(closeActiveWindows);
     teardown(async () => {

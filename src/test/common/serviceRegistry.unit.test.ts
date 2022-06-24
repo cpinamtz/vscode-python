@@ -35,7 +35,6 @@ import { InterpreterPathService } from '../../client/common/interpreterPathServi
 import { BrowserService } from '../../client/common/net/browser';
 import { HttpClient } from '../../client/common/net/httpClient';
 import { PersistentStateFactory } from '../../client/common/persistentState';
-import { PathUtils } from '../../client/common/platform/pathUtils';
 import { CurrentProcess } from '../../client/common/process/currentProcess';
 import { registerTypes } from '../../client/common/serviceRegistry';
 import { TerminalActivator } from '../../client/common/terminal/activator';
@@ -70,7 +69,6 @@ import {
     IHttpClient,
     IInstaller,
     IInterpreterPathService,
-    IPathUtils,
     IPersistentStateFactory,
     IRandom,
     IToolExecutionPath,
@@ -81,6 +79,8 @@ import { Random } from '../../client/common/utils/random';
 import { IServiceManager } from '../../client/ioc/types';
 import { ImportTracker } from '../../client/telemetry/importTracker';
 import { IImportTracker } from '../../client/telemetry/types';
+import { IFileSystemPathUtils } from '../../client/common/platform/types';
+import { FileSystemPathUtils } from '../../client/common/platform/fs-paths';
 
 suite('Common - Service Registry', () => {
     test('Registrations', () => {
@@ -93,7 +93,7 @@ suite('Common - Service Registry', () => {
             [IRandom, Random],
             [IPersistentStateFactory, PersistentStateFactory],
             [ITerminalServiceFactory, TerminalServiceFactory],
-            [IPathUtils, PathUtils],
+            [IFileSystemPathUtils, FileSystemPathUtils],
             [IApplicationShell, ApplicationShell],
             [ICurrentProcess, CurrentProcess],
             [IInstaller, ProductInstaller],

@@ -46,7 +46,6 @@ import { BrowserService } from '../../client/common/net/browser';
 import { FileDownloader } from '../../client/common/net/fileDownloader';
 import { HttpClient } from '../../client/common/net/httpClient';
 import { PersistentStateFactory } from '../../client/common/persistentState';
-import { PathUtils } from '../../client/common/platform/pathUtils';
 import { CurrentProcess } from '../../client/common/process/currentProcess';
 import { ProcessLogger } from '../../client/common/process/logger';
 import { IProcessLogger, IProcessServiceFactory } from '../../client/common/process/types';
@@ -84,7 +83,6 @@ import {
     IHttpClient,
     IInstaller,
     IInterpreterPathService,
-    IPathUtils,
     IPersistentStateFactory,
     IRandom,
     IsWindows,
@@ -102,6 +100,8 @@ import { MockModuleInstaller } from '../mocks/moduleInstaller';
 import { MockProcessService } from '../mocks/proc';
 import { UnitTestIocContainer } from '../testing/serviceRegistry';
 import { closeActiveWindows, initializeTest, IS_MULTI_ROOT_TEST, TEST_TIMEOUT } from '../initialize';
+import { IFileSystemPathUtils } from '../../client/common/platform/types';
+import { FileSystemPathUtils } from '../../client/common/platform/fs-paths';
 
 suite('Installer', () => {
     let ioc: UnitTestIocContainer;
@@ -133,7 +133,7 @@ suite('Installer', () => {
 
         ioc.serviceManager.addSingleton<IPersistentStateFactory>(IPersistentStateFactory, PersistentStateFactory);
         ioc.serviceManager.addSingleton<IInstaller>(IInstaller, ProductInstaller);
-        ioc.serviceManager.addSingleton<IPathUtils>(IPathUtils, PathUtils);
+        ioc.serviceManager.addSingleton<IFileSystemPathUtils>(IFileSystemPathUtils, FileSystemPathUtils);
         ioc.serviceManager.addSingleton<IProcessLogger>(IProcessLogger, ProcessLogger);
         ioc.serviceManager.addSingleton<ICurrentProcess>(ICurrentProcess, CurrentProcess);
         ioc.serviceManager.addSingleton<IInstallationChannelManager>(
