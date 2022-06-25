@@ -7,8 +7,7 @@ import { inject, injectable } from 'inversify';
 import * as path from 'path';
 import { Uri, WorkspaceFolder } from 'vscode';
 import { IWorkspaceService } from '../../../../common/application/types';
-import { IFileSystem } from '../../../../common/platform/types';
-import { IPathUtils } from '../../../../common/types';
+import { IFileSystem, IFileSystemPathUtils } from '../../../../common/platform/types';
 import { DebugConfigStrings } from '../../../../common/utils/localize';
 import { MultiStepInput } from '../../../../common/utils/multiStepInput';
 import { SystemVariables } from '../../../../common/variables/systemVariables';
@@ -28,11 +27,11 @@ export class PyramidLaunchDebugConfigurationProvider implements IDebugConfigurat
     constructor(
         @inject(IFileSystem) private fs: IFileSystem,
         @inject(IWorkspaceService) private readonly workspace: IWorkspaceService,
-        @inject(IPathUtils) private pathUtils: IPathUtils,
+        @inject(IFileSystemPathUtils) private pathUtils: IFileSystemPathUtils,
     ) {}
     public async buildConfiguration(input: MultiStepInput<DebugConfigurationState>, state: DebugConfigurationState) {
         const iniPath = await this.getDevelopmentIniPath(state.folder);
-        const defaultIni = `${workspaceFolderToken}${this.pathUtils.separator}development.ini`;
+        const defaultIni = `${workspaceFolderToken}${this.pathUtils.paths.sep}development.ini`;
         let manuallyEnteredAValue: boolean | undefined;
 
         const config: Partial<LaunchRequestArguments> = {
@@ -101,7 +100,7 @@ export class PyramidLaunchDebugConfigurationProvider implements IDebugConfigurat
         }
         const defaultLocationOfManagePy = path.join(folder.uri.fsPath, 'development.ini');
         if (await this.fs.fileExists(defaultLocationOfManagePy)) {
-            return `${workspaceFolderToken}${this.pathUtils.separator}development.ini`;
+            return `${workspaceFolderToken}${this.pathUtils.paths.sep}development.ini`;
         }
     }
 }

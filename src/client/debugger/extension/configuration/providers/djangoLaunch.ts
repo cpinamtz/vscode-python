@@ -7,8 +7,7 @@ import { inject, injectable } from 'inversify';
 import * as path from 'path';
 import { Uri, WorkspaceFolder } from 'vscode';
 import { IWorkspaceService } from '../../../../common/application/types';
-import { IFileSystem } from '../../../../common/platform/types';
-import { IPathUtils } from '../../../../common/types';
+import { IFileSystem, IFileSystemPathUtils } from '../../../../common/platform/types';
 import { DebugConfigStrings } from '../../../../common/utils/localize';
 import { MultiStepInput } from '../../../../common/utils/multiStepInput';
 import { SystemVariables } from '../../../../common/variables/systemVariables';
@@ -25,12 +24,12 @@ export class DjangoLaunchDebugConfigurationProvider implements IDebugConfigurati
     constructor(
         @inject(IFileSystem) private fs: IFileSystem,
         @inject(IWorkspaceService) private readonly workspace: IWorkspaceService,
-        @inject(IPathUtils) private pathUtils: IPathUtils,
+        @inject(IFileSystemPathUtils) private pathUtils: IFileSystemPathUtils,
     ) {}
     public async buildConfiguration(input: MultiStepInput<DebugConfigurationState>, state: DebugConfigurationState) {
         const program = await this.getManagePyPath(state.folder);
         let manuallyEnteredAValue: boolean | undefined;
-        const defaultProgram = `${workspaceFolderToken}${this.pathUtils.separator}manage.py`;
+        const defaultProgram = `${workspaceFolderToken}${this.pathUtils.paths.sep}manage.py`;
         const config: Partial<LaunchRequestArguments> = {
             name: DebugConfigStrings.django.snippet.name,
             type: DebuggerTypeName,
@@ -89,7 +88,7 @@ export class DjangoLaunchDebugConfigurationProvider implements IDebugConfigurati
         }
         const defaultLocationOfManagePy = path.join(folder.uri.fsPath, 'manage.py');
         if (await this.fs.fileExists(defaultLocationOfManagePy)) {
-            return `${workspaceFolderToken}${this.pathUtils.separator}manage.py`;
+            return `${workspaceFolderToken}${this.pathUtils.paths.sep}manage.py`;
         }
     }
 }
