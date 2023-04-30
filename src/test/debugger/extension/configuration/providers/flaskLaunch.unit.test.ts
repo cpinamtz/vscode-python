@@ -8,12 +8,13 @@ import * as path from 'path';
 import * as fs from 'fs-extra';
 import * as sinon from 'sinon';
 import { anything, instance, mock, when } from 'ts-mockito';
-import { Uri } from 'vscode';
+import { FileType, Uri } from 'vscode';
 import { DebugConfigStrings } from '../../../../../client/common/utils/localize';
 import { MultiStepInput } from '../../../../../client/common/utils/multiStepInput';
 import { DebuggerTypeName } from '../../../../../client/debugger/constants';
 import { DebugConfigurationState } from '../../../../../client/debugger/extension/types';
 import * as flaskLaunch from '../../../../../client/debugger/extension/configuration/providers/flaskLaunch';
+import { FileSystemUtils } from '../../../../../client/common/platform/fileSystem';
 
 /**
  * Just for test purposes to make easier Flask Config object creation
@@ -37,13 +38,16 @@ function getFlaskConfigObject(flaskAppEnvVarValue?: string) {
 
 suite('Debugging - Configuration Provider Flask', () => {
     let pathExistsStub: sinon.SinonStub;
+    let listdirStub: sinon.SinonStub;
     let input: MultiStepInput<DebugConfigurationState>;
     setup(() => {
         input = mock<MultiStepInput<DebugConfigurationState>>(MultiStepInput);
         pathExistsStub = sinon.stub(fs, 'pathExists');
+        listdirStub = sinon.stub(FileSystemUtils.prototype, 'listdir');
     });
     teardown(() => {
         sinon.restore();
+        listdirStub.restore();
     });
     test("getApplicationPath should return undefined if file doesn't exist", async () => {
         const folder = { uri: Uri.parse(path.join('one', 'two')), name: '1', index: 0 };
@@ -87,6 +91,21 @@ suite('Debugging - Configuration Provider Flask', () => {
         const folder = { uri: Uri.parse(path.join('one', 'two')), name: '1', index: 0 };
         const state = { config: {}, folder };
         when(input.showQuickPick(anything())).thenResolve();
+
+        await flaskLaunch.buildFlaskLaunchDebugConfiguration(instance(input), state);
+
+        const config = getFlaskConfigObject();
+
+        expect(state.config).to.be.deep.equal(config);
+    });
+    test('Launch JSON with a single Python file in QuickPick selector', async () => {
+        listdirStub.withArgs().resolves([
+            ['my/workspacefolder/app.py', FileType.File],
+            ['a_not_python_file.cpp', FileType.File],
+        ]);
+        when(input.showQuickPick(anything())).thenResolve({ label: 'app.py' });
+        const folder = { uri: Uri.parse(path.join('one', 'two')), name: '1', index: 0 };
+        const state = { config: {}, folder };
 
         await flaskLaunch.buildFlaskLaunchDebugConfiguration(instance(input), state);
 

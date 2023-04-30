@@ -5,7 +5,7 @@
 
 import * as path from 'path';
 import * as fs from 'fs-extra';
-import { WorkspaceFolder } from 'vscode';
+import { WorkspaceFolder, QuickPickItem, FileType } from 'vscode';
 import { DebugConfigStrings } from '../../../../common/utils/localize';
 import { MultiStepInput } from '../../../../common/utils/multiStepInput';
 import { sendTelemetryEvent } from '../../../../telemetry';
@@ -13,6 +13,8 @@ import { EventName } from '../../../../telemetry/constants';
 import { DebuggerTypeName } from '../../../constants';
 import { LaunchRequestArguments } from '../../../types';
 import { DebugConfigurationState, DebugConfigurationType } from '../../types';
+import { FileSystemUtils, filterByFileType } from '../../../../common/platform/fileSystem';
+import { WorkspaceService } from '../../../../common/application/workspace';
 
 export async function buildFlaskLaunchDebugConfiguration(
     input: MultiStepInput<DebugConfigurationState>,
@@ -35,20 +37,59 @@ export async function buildFlaskLaunchDebugConfiguration(
     };
 
     if (!application) {
-        const selectedApp = await input.showInputBox({
-            title: DebugConfigStrings.flask.enterAppPathOrNamePath.title,
-            value: 'app.py',
-            prompt: DebugConfigStrings.flask.enterAppPathOrNamePath.prompt,
-            validate: (value) =>
-                Promise.resolve(
-                    value && value.trim().length > 0
-                        ? undefined
-                        : DebugConfigStrings.flask.enterAppPathOrNamePath.invalid,
-                ),
-        });
-        if (selectedApp) {
-            manuallyEnteredAValue = true;
-            config.env!.FLASK_APP = selectedApp;
+        const workspaceRootPath = new WorkspaceService().rootPath;
+        const fsUtils = FileSystemUtils.withDefaults();
+        if (workspaceRootPath) {
+            const files = await fsUtils.listdir(workspaceRootPath);
+            const filteredPythonFiles = filterByFileType(files, FileType.File).filter((filteredFile) =>
+                filteredFile[0].endsWith('.py'),
+            );
+            const items: QuickPickItem[] = [];
+            filteredPythonFiles.forEach((filteredFile) => {
+                const fileNameChunks = filteredFile[0].split(workspaceRootPath + path.sep)
+                const fileName = fileNameChunks[fileNameChunks.length - 1];
+                items.push({
+                    label: fileName.replace('/', '.'),
+                    description: filteredFile[0],
+                });
+            });
+
+            if (filteredPythonFiles.length > 0) {
+                const selectedFlaskAppEnvVar = await input.showQuickPick({
+                    title: DebugConfigStrings.flask.enterAppPathOrNamePath.title,
+                    items,
+                    placeholder: 'Find by the name of the file where the Flask app is instantiated',
+                    acceptFilterBoxTextAsSelection: true,
+                    initialize: (quickPick) =>
+                        Promise.resolve(
+                            quickPick && quickPick.value.trim().length > 0
+                                ? undefined
+                                : DebugConfigStrings.flask.enterAppPathOrNamePath.invalid,
+                        ),
+                    prompt: DebugConfigStrings.flask.enterAppPathOrNamePath.prompt,
+                });
+                if (selectedFlaskAppEnvVar) {
+                    manuallyEnteredAValue = true;
+                    config.env!.FLASK_APP = selectedFlaskAppEnvVar.label;
+                }
+            }
+        } else {
+            const selectedFlaskAppEnvVar = await input.showInputBox({
+                title: DebugConfigStrings.flask.enterAppPathOrNamePath.title,
+                value: 'app.py',
+                prompt: DebugConfigStrings.flask.enterAppPathOrNamePath.prompt,
+                validate: (value) =>
+                    Promise.resolve(
+                        value && value.trim().length > 0
+                            ? undefined
+                            : DebugConfigStrings.flask.enterAppPathOrNamePath.invalid,
+                    ),
+            });
+
+            if (selectedFlaskAppEnvVar) {
+                manuallyEnteredAValue = true;
+                config.env!.FLASK_APP = selectedFlaskAppEnvVar;
+            }
         }
     }
 

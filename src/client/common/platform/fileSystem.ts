@@ -45,7 +45,7 @@ export function convertStat(old: fs.Stats, filetype: FileType): FileStat {
     };
 }
 
-function filterByFileType(
+export function filterByFileType(
     files: [string, FileType][], // the files to filter
     fileType: FileType, // the file type to look for
 ): [string, FileType][] {
