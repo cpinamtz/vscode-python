@@ -15,6 +15,26 @@ import { DebuggerTypeName } from '../../../../../client/debugger/constants';
 import { DebugConfigurationState } from '../../../../../client/debugger/extension/types';
 import * as flaskLaunch from '../../../../../client/debugger/extension/configuration/providers/flaskLaunch';
 
+/**
+ * Just for test purposes to make easier Flask Config object creation
+ * @param  {string} flaskAppEnvVarValue?
+ */
+function getFlaskConfigObject(flaskAppEnvVarValue?: string) {
+    return {
+        name: DebugConfigStrings.flask.snippet.name,
+        type: DebuggerTypeName,
+        request: 'launch',
+        module: 'flask',
+        env: {
+            FLASK_APP: flaskAppEnvVarValue || 'app.py',
+            FLASK_DEBUG: '1',
+        },
+        args: ['run', '--no-debugger', '--no-reload'],
+        jinja: true,
+        justMyCode: true,
+    };
+}
+
 suite('Debugging - Configuration Provider Flask', () => {
     let pathExistsStub: sinon.SinonStub;
     let input: MultiStepInput<DebugConfigurationState>;
@@ -47,19 +67,7 @@ suite('Debugging - Configuration Provider Flask', () => {
 
         await flaskLaunch.buildFlaskLaunchDebugConfiguration(instance(input), state);
 
-        const config = {
-            name: DebugConfigStrings.flask.snippet.name,
-            type: DebuggerTypeName,
-            request: 'launch',
-            module: 'flask',
-            env: {
-                FLASK_APP: 'app.py',
-                FLASK_DEBUG: '1',
-            },
-            args: ['run', '--no-debugger', '--no-reload'],
-            jinja: true,
-            justMyCode: true,
-        };
+        const config = getFlaskConfigObject();
 
         expect(state.config).to.be.deep.equal(config);
     });
@@ -67,46 +75,22 @@ suite('Debugging - Configuration Provider Flask', () => {
         const folder = { uri: Uri.parse(path.join('one', 'two')), name: '1', index: 0 };
         const state = { config: {}, folder };
 
-        when(input.showInputBox(anything())).thenResolve('hello');
+        when(input.showQuickPick(anything())).thenResolve({ label: 'hello' });
 
         await flaskLaunch.buildFlaskLaunchDebugConfiguration(instance(input), state);
 
-        const config = {
-            name: DebugConfigStrings.flask.snippet.name,
-            type: DebuggerTypeName,
-            request: 'launch',
-            module: 'flask',
-            env: {
-                FLASK_APP: 'hello',
-                FLASK_DEBUG: '1',
-            },
-            args: ['run', '--no-debugger', '--no-reload'],
-            jinja: true,
-            justMyCode: true,
-        };
+        const config = getFlaskConfigObject('hello');
 
         expect(state.config).to.be.deep.equal(config);
     });
     test('Launch JSON with default managepy path', async () => {
         const folder = { uri: Uri.parse(path.join('one', 'two')), name: '1', index: 0 };
         const state = { config: {}, folder };
-        when(input.showInputBox(anything())).thenResolve();
+        when(input.showQuickPick(anything())).thenResolve();
 
         await flaskLaunch.buildFlaskLaunchDebugConfiguration(instance(input), state);
 
-        const config = {
-            name: DebugConfigStrings.flask.snippet.name,
-            type: DebuggerTypeName,
-            request: 'launch',
-            module: 'flask',
-            env: {
-                FLASK_APP: 'app.py',
-                FLASK_DEBUG: '1',
-            },
-            args: ['run', '--no-debugger', '--no-reload'],
-            jinja: true,
-            justMyCode: true,
-        };
+        const config = getFlaskConfigObject();
 
         expect(state.config).to.be.deep.equal(config);
     });
