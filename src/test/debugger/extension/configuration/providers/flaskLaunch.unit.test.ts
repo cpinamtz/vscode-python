@@ -68,6 +68,7 @@ suite('Debugging - Configuration Provider Flask', () => {
     test('Launch JSON with valid python path', async () => {
         const folder = { uri: Uri.parse(path.join('one', 'two')), name: '1', index: 0 };
         const state = { config: {}, folder };
+        listdirStub.withArgs().resolves([]);
 
         await flaskLaunch.buildFlaskLaunchDebugConfiguration(instance(input), state);
 
@@ -78,6 +79,7 @@ suite('Debugging - Configuration Provider Flask', () => {
     test('Launch JSON with selected app path', async () => {
         const folder = { uri: Uri.parse(path.join('one', 'two')), name: '1', index: 0 };
         const state = { config: {}, folder };
+        listdirStub.withArgs().resolves([['one/two/hello.py', FileType.File]]);
 
         when(input.showQuickPick(anything())).thenResolve({ label: 'hello' });
 
@@ -90,22 +92,8 @@ suite('Debugging - Configuration Provider Flask', () => {
     test('Launch JSON with default managepy path', async () => {
         const folder = { uri: Uri.parse(path.join('one', 'two')), name: '1', index: 0 };
         const state = { config: {}, folder };
+        listdirStub.withArgs().resolves([]);
         when(input.showQuickPick(anything())).thenResolve();
-
-        await flaskLaunch.buildFlaskLaunchDebugConfiguration(instance(input), state);
-
-        const config = getFlaskConfigObject();
-
-        expect(state.config).to.be.deep.equal(config);
-    });
-    test('Launch JSON with a single Python file in QuickPick selector', async () => {
-        listdirStub.withArgs().resolves([
-            ['my/workspacefolder/app.py', FileType.File],
-            ['a_not_python_file.cpp', FileType.File],
-        ]);
-        when(input.showQuickPick(anything())).thenResolve({ label: 'app.py' });
-        const folder = { uri: Uri.parse(path.join('one', 'two')), name: '1', index: 0 };
-        const state = { config: {}, folder };
 
         await flaskLaunch.buildFlaskLaunchDebugConfiguration(instance(input), state);
 

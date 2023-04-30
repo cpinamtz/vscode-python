@@ -14,7 +14,6 @@ import { DebuggerTypeName } from '../../../constants';
 import { LaunchRequestArguments } from '../../../types';
 import { DebugConfigurationState, DebugConfigurationType } from '../../types';
 import { FileSystemUtils, filterByFileType } from '../../../../common/platform/fileSystem';
-import { WorkspaceService } from '../../../../common/application/workspace';
 
 export async function buildFlaskLaunchDebugConfiguration(
     input: MultiStepInput<DebugConfigurationState>,
@@ -36,22 +35,46 @@ export async function buildFlaskLaunchDebugConfiguration(
         justMyCode: true,
     };
 
+    async function showInputBox() {
+        const selectedFlaskAppEnvVar = await input.showInputBox({
+            title: DebugConfigStrings.flask.enterAppPathOrNamePath.title,
+            value: 'app.py',
+            prompt: DebugConfigStrings.flask.enterAppPathOrNamePath.prompt,
+            validate: (value) =>
+                Promise.resolve(
+                    value && value.trim().length > 0
+                        ? undefined
+                        : DebugConfigStrings.flask.enterAppPathOrNamePath.invalid,
+                ),
+        });
+
+        if (selectedFlaskAppEnvVar) {
+            manuallyEnteredAValue = true;
+            config.env!.FLASK_APP = selectedFlaskAppEnvVar;
+        }
+    }
+
     if (!application) {
-        const workspaceRootPath = new WorkspaceService().rootPath;
         const fsUtils = FileSystemUtils.withDefaults();
-        if (workspaceRootPath) {
-            const files = await fsUtils.listdir(workspaceRootPath);
+        if (state.folder) {
+            const folderPath = state.folder.uri.path;
+            const files = await fsUtils.listdir(folderPath);
             const filteredPythonFiles = filterByFileType(files, FileType.File).filter((filteredFile) =>
                 filteredFile[0].endsWith('.py'),
             );
             const items: QuickPickItem[] = [];
             filteredPythonFiles.forEach((filteredFile) => {
-                const fileNameChunks = filteredFile[0].split(workspaceRootPath + path.sep)
-                const fileName = fileNameChunks[fileNameChunks.length - 1];
-                items.push({
-                    label: fileName.replace('/', '.'),
-                    description: filteredFile[0],
-                });
+                const fileNameChunks = filteredFile[0].split(folderPath + path.sep);
+                const fileNamePath = fileNameChunks[fileNameChunks.length - 1];
+                if (
+                    fileNamePath.endsWith('main.py') ||
+                    fileNamePath.endsWith('app.py') ||
+                    fileNamePath.endsWith('wsgi.py')
+                )
+                    items.push({
+                        label: fileNamePath.replace('/', '.'),
+                        description: filteredFile[0],
+                    });
             });
 
             if (filteredPythonFiles.length > 0) {
@@ -72,24 +95,11 @@ export async function buildFlaskLaunchDebugConfiguration(
                     manuallyEnteredAValue = true;
                     config.env!.FLASK_APP = selectedFlaskAppEnvVar.label;
                 }
+            } else {
+                showInputBox();
             }
         } else {
-            const selectedFlaskAppEnvVar = await input.showInputBox({
-                title: DebugConfigStrings.flask.enterAppPathOrNamePath.title,
-                value: 'app.py',
-                prompt: DebugConfigStrings.flask.enterAppPathOrNamePath.prompt,
-                validate: (value) =>
-                    Promise.resolve(
-                        value && value.trim().length > 0
-                            ? undefined
-                            : DebugConfigStrings.flask.enterAppPathOrNamePath.invalid,
-                    ),
-            });
-
-            if (selectedFlaskAppEnvVar) {
-                manuallyEnteredAValue = true;
-                config.env!.FLASK_APP = selectedFlaskAppEnvVar;
-            }
+            showInputBox();
         }
     }
 
