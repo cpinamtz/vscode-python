@@ -277,6 +277,9 @@ export namespace DebugConfigStrings {
         title: l10n.t('Select a debug configuration'),
         placeholder: l10n.t('Debug Configuration'),
     };
+    export const selectCustomPath = {
+        title: l10n.t("Enter file's path where app is instantiated"),
+    };
     export const launchJsonCompletions = {
         label: l10n.t('Python'),
         description: l10n.t('Select a Python debug configuration'),

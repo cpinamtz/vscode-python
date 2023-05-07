@@ -5,28 +5,21 @@
 
 import * as path from 'path';
 import * as fs from 'fs-extra';
-import { WorkspaceFolder, QuickPickItem, FileType } from 'vscode';
-import { DebugConfigStrings, InterpreterQuickPickList } from '../../../../common/utils/localize';
+import { WorkspaceFolder } from 'vscode';
+import { DebugConfigStrings } from '../../../../common/utils/localize';
 import { MultiStepInput } from '../../../../common/utils/multiStepInput';
 import { sendTelemetryEvent } from '../../../../telemetry';
 import { EventName } from '../../../../telemetry/constants';
 import { DebuggerTypeName } from '../../../constants';
 import { LaunchRequestArguments } from '../../../types';
 import { DebugConfigurationState, DebugConfigurationType } from '../../types';
-import { FileSystemUtils, filterByFileType } from '../../../../common/platform/fileSystem';
-import { ISpecialQuickPickItem } from '../../../../interpreter/configuration/types';
-import { Octicons } from '../../../../common/constants';
+import { createItems, expectedFileNames, manualEntrySuggestion } from './providersUtils';
 
 export async function buildFlaskLaunchDebugConfiguration(
     input: MultiStepInput<DebugConfigurationState>,
     state: DebugConfigurationState,
 ): Promise<void> {
-    const manualEntrySuggestion: ISpecialQuickPickItem = {
-        label: `${Octicons.Add} ${InterpreterQuickPickList.enterPath.label}`,
-        alwaysShow: true,
-    };
     const application = await getApplicationPath(state.folder);
-    const expectedFileNames: string[] = ['app.py', 'wsgi.py', 'main.py'];
     let manuallyEnteredAValue: boolean | undefined;
     const config: Partial<LaunchRequestArguments> = {
         name: DebugConfigStrings.flask.snippet.name,
@@ -41,34 +34,6 @@ export async function buildFlaskLaunchDebugConfiguration(
         jinja: true,
         justMyCode: true,
     };
-
-    async function createItems(folder?: WorkspaceFolder): Promise<QuickPickItem[]> {
-        const items: QuickPickItem[] = [manualEntrySuggestion];
-
-        if (folder) {
-            const folderPath = folder.uri.path;
-            const files = await FileSystemUtils.withDefaults().listdir(folderPath);
-            const filteredPythonFiles = filterByFileType(files, FileType.File).filter((filteredFile) =>
-                filteredFile[0].endsWith('.py'),
-            );
-
-            filteredPythonFiles.forEach((filteredFile) => {
-                const fileNameChunks = filteredFile[0].split(folderPath + path.sep);
-                const fileNamePath = fileNameChunks[fileNameChunks.length - 1];
-
-                for (const expectedFileName of expectedFileNames) {
-                    if (fileNamePath.endsWith(expectedFileName)) {
-                        items.push({
-                            label: fileNamePath.replace('/', '.'),
-                            description: filteredFile[0],
-                        });
-                    }
-                }
-            });
-        }
-
-        return items;
-    }
 
     if (!application) {
         const items = await createItems(state.folder);
