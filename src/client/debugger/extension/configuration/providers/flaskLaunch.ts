@@ -26,7 +26,7 @@ export async function buildFlaskLaunchDebugConfiguration(
         alwaysShow: true,
     };
     const application = await getApplicationPath(state.folder);
-    const expectedFileNames: string[] = ['main.py', 'app.py', 'wsgi.py'];
+    const expectedFileNames: string[] = ['app.py', 'wsgi.py', 'main.py'];
     let manuallyEnteredAValue: boolean | undefined;
     const config: Partial<LaunchRequestArguments> = {
         name: DebugConfigStrings.flask.snippet.name,
@@ -41,25 +41,6 @@ export async function buildFlaskLaunchDebugConfiguration(
         jinja: true,
         justMyCode: true,
     };
-
-    async function showInputBox() {
-        const selectedFlaskAppEnvVar = await input.showInputBox({
-            title: DebugConfigStrings.flask.enterAppPathOrNamePath.title,
-            value: 'app.py',
-            prompt: DebugConfigStrings.flask.enterAppPathOrNamePath.prompt,
-            validate: (value) =>
-                Promise.resolve(
-                    value && value.trim().length > 0
-                        ? undefined
-                        : DebugConfigStrings.flask.enterAppPathOrNamePath.invalid,
-                ),
-        });
-
-        if (selectedFlaskAppEnvVar) {
-            manuallyEnteredAValue = true;
-            config.env!.FLASK_APP = selectedFlaskAppEnvVar;
-        }
-    }
 
     async function createItems(folder?: WorkspaceFolder): Promise<QuickPickItem[]> {
         const items: QuickPickItem[] = [manualEntrySuggestion];
@@ -105,10 +86,23 @@ export async function buildFlaskLaunchDebugConfiguration(
             prompt: DebugConfigStrings.flask.enterAppPathOrNamePath.prompt,
         });
         if (selectedFlaskAppEnvVar) {
+            manuallyEnteredAValue = true;
             if (selectedFlaskAppEnvVar.label === manualEntrySuggestion.label) {
-                showInputBox();
+                const manualEntrySelectedFlaskAppEnvVar = await input.showInputBox({
+                    title: DebugConfigStrings.flask.enterAppPathOrNamePath.title,
+                    value: expectedFileNames[0],
+                    prompt: DebugConfigStrings.flask.enterAppPathOrNamePath.prompt,
+                    validate: (value) =>
+                        Promise.resolve(
+                            value && value.trim().length > 0
+                                ? undefined
+                                : DebugConfigStrings.flask.enterAppPathOrNamePath.invalid,
+                        ),
+                });
+                if (manualEntrySelectedFlaskAppEnvVar) {
+                    config.env!.FLASK_APP = manualEntrySelectedFlaskAppEnvVar;
+                }
             } else {
-                manuallyEnteredAValue = true;
                 config.env!.FLASK_APP = selectedFlaskAppEnvVar.label;
             }
         }
